@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "ITGSwagger",
+  "title": "Swagger API Endpoint & Class Generator",
+  "type": "object",
+  "description": "This schematic generates API Endpoints, export Class for Angular CLI Projects",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name of the file"
+    },
+    "swaggerPath": {
+      "type": "string",
+      "description": "Swagger API JSON Path"
+    },
+    "project": {
+      "type": "string",
+      "description": "Generate in specific Angular CLI workspace project"
+    },
+    "prefix": {
+      "type": "string",
+      "description": "Generate with specific prefix"
+    }
+  }
+}

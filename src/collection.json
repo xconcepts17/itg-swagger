@@ -1,0 +1,11 @@
+{
+  "$schema": "../node_modules/@angular-devkit/schematics/collection-schema.json",
+  "schematics": {
+    "itg-swagger": {
+      "description": "This schematic generates API Endpoints, export Class for Angular CLI Projects",
+      "factory": "./itg-swagger/index#itgSwagger",
+      "schema": "./itg-swagger/itg-schema.json",
+      "aliases": ["itg-ep"]
+    }
+  }
+}
