@@ -1,8 +1,7 @@
 export interface ItgSchema {
+  name: string;
   swaggerPath?: string;
   prefix?: string;
   project?: string;
-  endPoints?: any;
   services?: any;
-  classes?: any;
 }

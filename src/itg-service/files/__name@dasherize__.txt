@@ -1,0 +1,23 @@
+<% for(let xservice of services) {  %><%= xservice.methodName %> () {
+    // this.loadingTrue = true;
+    // this.btnClicked = true;
+    this.fullspinnerService.empty.next(true);
+    this.data.getData().then(
+     (success: any)=>{
+        this.vendor = success;
+        // this.loadingTrue = false;
+        // this.btnClicked = false;
+        this.fullspinnerService.empty.next(false);
+
+     }, 
+     (error:any)=>{
+        // this.loadingTrue = false;
+        // this.btnClicked = false;
+        this.fullspinnerService.empty.next(false);
+        this.data.errorMethod(error);
+     })
+
+}
+
+<% } %>
+   

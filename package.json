@@ -1,6 +1,6 @@
 {
   "name": "itg-swagger",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "This angular schematic was designed specifically for ITGalax Solution, Chennai | FIJI. This schematic generates API Endpoints, export Class for Angular CLI Projects. Additionally API Service call method can also be generated.",
   "scripts": {
     "build": "tsc -p tsconfig.json",

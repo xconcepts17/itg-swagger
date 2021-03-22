@@ -34,7 +34,10 @@ export function itgSwagger(_options: ItgSchema): Rule {
     const { name, path } = parasedPath;
     const finalPath = path + "/common/config";
 
-    _options.endPoints = generateEndPoints(_options, tree);
+    const apiGroup = generateEndPoints(_options, tree);
+
+    _options.endPoints = apiGroup.tags;
+    _options.services = apiGroup.methods;
     _options.classes = generateClasses(_options, tree);
 
     // console.log(JSON.stringify(_options.classes));
@@ -71,18 +74,35 @@ function getPathFn(paths: any, summary: any) {
     summaryName + ": AppConfig.basePath + '" + paths.substring(1) + "'";
   return endPointPath;
 }
+
+function getServicePath(method: any, tags: any, summary: any) {
+  let service = {
+    method: method,
+    name: camelize(summary),
+    path: "ApiEndpoint.path." + tags + "." + camelize(summary),
+  };
+
+  return service;
+}
+
 function generateEndPoints(_options: any, tree: any) {
   const swaggerPath = _options.swaggerPath
     ? _options.swaggerPath
     : "swagger.json";
   // Get the Swagger JSON
   const swaggerConfigBuffer = tree.read(swaggerPath);
+
   if (!swaggerConfigBuffer) {
     throw new SchematicsException("No swagger.json in workspace");
   }
   const swaggerConfig = JSON.parse(swaggerConfigBuffer.toString());
-
+  let groups: any = {
+    tags: [],
+    methods: [],
+  };
   let tags: any = [];
+  let methods: any = [];
+
   for (const opPath of Object.keys(swaggerConfig.paths)) {
     let currentTags = "";
     swaggerConfig.paths[opPath].get
@@ -101,18 +121,41 @@ function generateEndPoints(_options: any, tree: any) {
     if (index === -1) {
       let apiPaths: any = [];
       if (swaggerConfig.paths[opPath].get) {
+        // console.log(swaggerConfig.paths[opPath].get.summary);
+        // if (swaggerConfig.paths[opPath].get.summary !== "") {
+        //   throw new SchematicsException(
+        //     "Summary Tag Missing for path" + opPath
+        //   );
+        // }
         const apiEndpointPath = getPathFn(
           opPath,
           swaggerConfig.paths[opPath].get.summary
         );
         apiPaths.push(apiEndpointPath);
+        const apiServices = getServicePath(
+          "get",
+          currentTag,
+          swaggerConfig.paths[opPath].get.summary
+        );
+        methods.push(apiServices);
       }
       if (swaggerConfig.paths[opPath].post) {
+        // if (swaggerConfig.paths[opPath].get.summary !== "") {
+        //   throw new SchematicsException(
+        //     "Summary Tag Missing for path" + opPath
+        //   );
+        // }
         const apiEndpointPath = getPathFn(
           opPath,
           swaggerConfig.paths[opPath].post.summary
         );
         apiPaths.push(apiEndpointPath);
+        const apiServices = getServicePath(
+          "post",
+          currentTag,
+          swaggerConfig.paths[opPath].post.summary
+        );
+        methods.push(apiServices);
       }
       let endPointObject = {
         tag: currentTag,
@@ -121,22 +164,50 @@ function generateEndPoints(_options: any, tree: any) {
       tags.push(endPointObject);
     } else {
       if (swaggerConfig.paths[opPath].get) {
+        // if (swaggerConfig.paths[opPath].get.summary !== "") {
+        //   throw new SchematicsException(
+        //     "Summary Tag Missing for path" + opPath
+        //   );
+        // }
         const apiEndpointPath = getPathFn(
           opPath,
           swaggerConfig.paths[opPath].get.summary
         );
         tags[index].paths.push(apiEndpointPath);
+        const apiServices = getServicePath(
+          "get",
+          currentTag,
+          swaggerConfig.paths[opPath].get.summary
+        );
+        methods.push(apiServices);
       }
       if (swaggerConfig.paths[opPath].post) {
+        // if (swaggerConfig.paths[opPath].get.summary !== "") {
+        //   throw new SchematicsException(
+        //     "Summary Tag Missing for path" + opPath
+        //   );
+        // }
         const apiEndpointPath = getPathFn(
           opPath,
           swaggerConfig.paths[opPath].post.summary
         );
         tags[index].paths.push(apiEndpointPath);
+        const apiServices = getServicePath(
+          "post",
+          currentTag,
+          swaggerConfig.paths[opPath].post.summary
+        );
+        methods.push(apiServices);
+        // console.log(JSON.stringify(methods));
       }
     }
   }
-  return tags;
+
+  // console.log(JSON.stringify(methods));
+  groups.tags = tags;
+  groups.methods = methods;
+  // console.log(JSON.stringify(groups));
+  return groups;
   // console.log(JSON.stringify(tags));
 }
 
@@ -170,6 +241,7 @@ function generateClasses(_options: any, tree: any) {
     } else {
     }
   }
+  // console.log(JSON.stringify(classes));
   return classes;
 }
 
