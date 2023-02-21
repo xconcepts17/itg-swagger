@@ -7,6 +7,12 @@
       "schema": "./itg-swagger/itg-schema.json",
       "aliases": ["ep"]
     },
+    "itg-classes": {
+      "description": "This schematic generates API Endpoints, export Class for Angular CLI Projects",
+      "factory": "./itg-classes/index#itgClasses",
+      "schema": "./itg-classes/itg-schema.json",
+      "aliases": ["c"]
+    },
     "itg-service": {
       "description": "This schematic generates API Endpoints services for Angular CLI Projects",
       "factory": "./itg-service/index#itgService",

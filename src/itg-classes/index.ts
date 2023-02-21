@@ -1,5 +1,4 @@
 import { strings } from "@angular-devkit/core";
-import { camelize } from "@angular-devkit/core/src/utils/strings";
 import {
   apply,
   Rule,
@@ -17,7 +16,7 @@ import { parseName } from "@schematics/angular/utility/parse-name";
 import { buildDefaultPath } from "@schematics/angular/utility/workspace";
 import { ItgSchema } from "./itg-schema";
 
-export function itgSwagger(_options: ItgSchema): Rule {
+export function itgClasses(_options: ItgSchema): Rule {
   return (tree: Tree, _context: SchematicContext) => {
     const workspaceConfigBuffer = tree.read("angular.json");
     if (!workspaceConfigBuffer) {
@@ -25,20 +24,15 @@ export function itgSwagger(_options: ItgSchema): Rule {
     }
     const workspaceConfig = JSON.parse(workspaceConfigBuffer.toString());
     const projectName = _options.project || workspaceConfig.defaultProject;
-
     const project = workspaceConfig.projects[projectName];
-    console.log(project);
-    const defaultProjectPath = buildDefaultPath(project);
 
+    const defaultProjectPath = buildDefaultPath(project);
 
     const parasedPath = parseName(defaultProjectPath, "api.endpoints");
 
     const { name, path } = parasedPath;
     const finalPath = path + "/common/config";
 
-    const apiGroup = generateEndPoints(_options, tree);
-
-    _options.services = apiGroup.methods;
     _options.classes = generateClasses(_options, tree);
 
     const sourceTemplates = url("./files");
@@ -64,63 +58,6 @@ export function itgSwagger(_options: ItgSchema): Rule {
   };
 }
 
-function getServicePath(method: any, tags: any, summary: any) {
-  let service = {
-    method: method,
-    name: camelize(summary),
-    path: tags,
-  };
-  return service;
-}
-
-function generateEndPoints(_options: any, tree: any) {
-  const swaggerPath = _options.swaggerPath
-    ? _options.swaggerPath
-    : "swagger.json";
-  // Get the Swagger JSON
-  const swaggerConfigBuffer = tree.read(swaggerPath);
-
-  if (!swaggerConfigBuffer) {
-    throw new SchematicsException("No swagger.json in workspace");
-  }
-  const swaggerConfig = JSON.parse(swaggerConfigBuffer.toString());
-
-  let groups: any = {
-    methods: [],
-  };
-  let methods: any = [];
-
-  for (const opPath of Object.keys(swaggerConfig.paths)) {
-    // let apiPaths: any = [];
-    let currentPath = opPath.substring(1);
-    if (swaggerConfig.paths[opPath].get) {
-      if (swaggerConfig.paths[opPath].get.summary === undefined) {
-        console.log("Summary Name missing for " + opPath);
-      }
-      const apiServices = getServicePath(
-        "get",
-        currentPath,
-        swaggerConfig.paths[opPath].get.summary
-      );
-      methods.push(apiServices);
-    }
-
-    if (swaggerConfig.paths[opPath].post) {
-      if (swaggerConfig.paths[opPath].post.summary === undefined) {
-        console.log("Summary Name missing for " + opPath);
-      }
-      const apiServices = getServicePath(
-        "post",
-        currentPath,
-        swaggerConfig.paths[opPath].post.summary
-      );
-      methods.push(apiServices);
-    }
-  }
-  groups.methods = methods;
-  return groups;
-}
-
 function generateClasses(_options: any, tree: any) {
   const swaggerPath = _options.swaggerPath
     ? _options.swaggerPath
@@ -142,11 +79,7 @@ function generateClasses(_options: any, tree: any) {
         for (const property of Object.keys(xClass.properties)) {
           const xProperties = xClass.properties[property];
           let type = getType(xProperties, swaggerConfig.components.schemas);
-          let parseProperty = property + " = " + type;
-          if (type === "[]") {
-            parseProperty = property + ": any = " + type;
-          }
-
+          const parseProperty = property + " = " + type;
           properties.push(parseProperty);
         }
         const classObj = {

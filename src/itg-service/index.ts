@@ -14,7 +14,7 @@ import {
   mergeWith,
 } from "@angular-devkit/schematics";
 import { parseName } from "@schematics/angular/utility/parse-name";
-import { buildDefaultPath } from "@schematics/angular/utility/project";
+import { buildDefaultPath } from "@schematics/angular/utility/workspace";
 import { ItgSchema } from "./itg-schema";
 
 export function itgService(_options: ItgSchema): Rule {
